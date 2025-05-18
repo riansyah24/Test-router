@@ -22,20 +22,28 @@ const BackButtonHandler = () => {
   const location = useLocation();
 
   useEffect(() => {
-    const backButtonListener = CapacitorApp.addListener('backButton', ({ canGoBack }) => {
-      if (location.pathname === "/") {
-        // Jika di halaman Home, keluar aplikasi
-        CapacitorApp.exitApp();
-      } else {
-        // Jika tidak di Home, kembali ke halaman sebelumnya
-        window.history.back();
-      }
-    });
+    let listener: any;
+
+    const setupListener = async () => {
+      listener = await CapacitorApp.addListener('backButton', () => {
+        if (location.pathname === "/") {
+          // Jika di halaman Home, keluar aplikasi
+          CapacitorApp.exitApp();
+        } else {
+          // Jika tidak di Home, kembali ke halaman sebelumnya
+          window.history.back();
+        }
+      });
+    };
+
+    setupListener();
 
     return () => {
-      backButtonListener.remove();
+      if (listener) {
+        listener.remove();
+      }
     };
-  }, [location.pathname]); // Dependensi location.pathname agar listener update ketika route berubah
+  }, [location.pathname]);
 
   return null;
 }
