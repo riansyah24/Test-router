@@ -1,17 +1,27 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom"
-import Home from "./pages/Home.tsx"
-import About from "./pages/About.tsx"
-import Profile from "./pages/Profile.tsx"
-import { App } from '@capacitor/app';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home.tsx";
+import About from "./pages/About.tsx";
+import Profile from "./pages/Profile.tsx";
+import { App as CapacitorApp } from '@capacitor/app'; // Ubah nama import
+import { useEffect } from 'react'; // Tambahkan useEffect
 
 const App = () => {
-  App.addListener('backButton', ({ canGoBack }) => {
-  if (canGoBack) {
-    window.history.back();
-  } else {
-    App.exitApp();
-  }
-  });
+  useEffect(() => {
+    // Gunakan CapacitorApp sebagai ganti App
+    CapacitorApp.addListener('backButton', ({ canGoBack }: { canGoBack: boolean }) => {
+      if (canGoBack) {
+        window.history.back();
+      } else {
+        CapacitorApp.exitApp();
+      }
+    });
+
+    // Cleanup listener saat komponen unmount
+    return () => {
+      CapacitorApp.removeAllListeners();
+    };
+  }, []);
+
   return (
     <BrowserRouter>
       <Routes>
@@ -20,7 +30,7 @@ const App = () => {
         <Route path="/profile" element={<Profile/>} />
       </Routes>
     </BrowserRouter>
-  )
+  );
 }
 
-export default App
+export default App;
